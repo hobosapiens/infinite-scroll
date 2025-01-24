@@ -1,0 +1,27 @@
+:root {
+  --color-background: #252525;
+  --color-text: #FFFFFF;
+  --color-accent: #FEA150;
+
+  --card-border: 1px solid rgba(255, 255, 255, .1);
+  --card-gradient: linear-gradient(
+    252.11deg,
+    rgba(135, 137, 159, 0.55) -80.7%,
+    rgba(57, 58, 62, 0.55) 29.64%,
+    rgba(57, 58, 62, 0.55) 67.93%,
+    rgba(135, 137, 159, 0.55) 123.9%
+  );
+  --card-gradient-hover: linear-gradient(
+    252.11deg,
+    rgba(192, 122, 62, 0.55) -80.7%,
+    rgba(75, 76, 83, 0.55) 29.64%,
+    rgba(57, 58, 62, 0.55) 67.93%,
+    rgba(192, 122, 62, 0.55) 123.9%
+  );
+  --skeleton-gradient: linear-gradient(
+    90deg,
+    #ddda 40%,
+    #efefefaa,
+    #ddda 60%
+  ) right / 300% 100%;
+}
