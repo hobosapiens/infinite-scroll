@@ -1,9 +1,8 @@
 <script>
-import { debounce } from '@/utils';
 import { LOAD_DELAY } from '@/constants';
 
 /**
- * @description Options for the IntersectionObserver.
+ * @description Component that loads more users when the observer element becomes visible.
  * @prop {Object} options - The IntersectionObserver options.
  * @prop {number} [options.threshold=0] - A number between 0 and 1 indicating the percentage of the target's visibility the observer's callback should trigger.
  * @prop {string} [options.rootMargin='0px'] - Margin around the root. Can have values similar to the CSS margin property.
@@ -16,7 +15,7 @@ export default {
     options: {
       type: Object,
       default: () => ({
-        threshold: 0,
+        threshold: 1,
         rootMargin: '0px',
         root: null,
       }),
@@ -26,6 +25,8 @@ export default {
     return {
       observer: null,
       isLoading: false,
+      isProcessing: false,
+      queue: [],
     };
   },
   /**
@@ -36,29 +37,64 @@ export default {
   emits: ['on-load-more'],
   methods: {
     /**
+     * @description Adds a function to the queue and processes it with delay.
+     * @param {Function} fn - The function to be queued and executed.
+     * @method
+     * @returns {void}
+     */
+    createQueueExecutor(fn) {
+      this.queue.push(fn);
+
+      if (!this.isProcessing) {
+        this.processQueue();
+      }
+    },
+    /**
+     * @description Processes the queue with a delay between each function execution.
+     * @method
+     * @async
+     * @returns {void}
+     */
+    async processQueue() {
+      this.isProcessing = true;
+
+      while (this.queue.length > 0) {
+        const currentFunction = this.queue.shift();
+
+        try {
+          await currentFunction();
+        } catch (error) {
+          console.error('Ошибка выполнения функции:', error);
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, LOAD_DELAY));
+      }
+
+      this.isProcessing = false;
+    },
+    /**
      * @description Handles the IntersectionObserver entry.
      * @method
      * @emits on-load-more
      * @returns {void}
      */
     handleEntry() {
-      const handleEntryWithDebounce = debounce(() => {
-        this.isLoading = true;
+      this.createQueueExecutor(() => {
+        return new Promise((resolve) => {
+          this.isLoading = true;
 
-        this.$emit('on-load-more', () => {
-          this.isLoading = false;
+          this.$emit('on-load-more', () => {
+            this.isLoading = false;
+            resolve();
+          });
         });
-      }, LOAD_DELAY);
-
-      handleEntryWithDebounce();
+      });
     },
-
     /**
      * @description Initializes the IntersectionObserver to observe visibility changes of the root element.
      * When the observed element (`rootElement`) becomes visible, it triggers the `handleEntry` method.
      * @method
      * @returns {void}
-     * @see handleEntry
      */
     startObserving() {
       this.observer = new IntersectionObserver((entries) => {

@@ -8,4 +8,4 @@ export const STARTING_PAGE = 1;
 export const CARDS_ON_PAGE = 12;
 
 /** @constant {number} */
-export const LOAD_DELAY = 300;
+export const LOAD_DELAY = 500;
