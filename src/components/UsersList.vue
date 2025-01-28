@@ -74,8 +74,8 @@ export default {
   <NotFound v-if="isError" />
   <div v-else-if="usersList.length" class="users-list">
     <UserCard
-      v-for="({ name, picture, email, login, phone }) in usersList"
-      :key="login.username + phone"
+      v-for="({ name, picture, email, login }) in usersList"
+      :key="login.uuid"
       :email="email"
       :name="name"
       :picture="picture"
